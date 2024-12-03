@@ -38,6 +38,7 @@ exports.validateLogIn = [
 ];
 
 exports.validateEvent = [
+	body('category', 'Category must be one of the options given').isIn(["Educational", "Recreational", "Undergraduate", "Graduate", "Other"]),
 	body("title", "Title cannot be empty").notEmpty().trim().escape(),
 	body("location", "Location cannot be empty").notEmpty().trim().escape(),
 	body("start", "Start must be a valid Date")
