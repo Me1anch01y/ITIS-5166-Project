@@ -163,30 +163,36 @@ exports.rsvp = (req, res, next) => {
 	model
 		.findById(id)
 		.then((event) => {
-			if (event.host._id.toString() === user.toString()) {
-				let err = new Error("Hosts cannot RSVP to their own event.");
-				err.status = 401;
-				return next(err);
-			}
-			Rsvp.findOneAndUpdate(
-				{ event: id, user: user },
-				{ status: status },
-				{ upsert: true, new: true }
-			)
-				.then((rsvp) => {
-					if (rsvp) {
-						req.flash("success", "RSVP completed succesfully");
-						res.redirect("/users/profile");
-					} else {
-						req.flash("error", "There was an issue with your RSVP.");
-						res.redirect("back");
-					}
-				})
+			if (event) {
+				if (event.host._id.toString() === user.toString()) {
+					let err = new Error("Hosts cannot RSVP to their own event.");
+					err.status = 401;
+					return next(err);
+				}
+				Rsvp.findOneAndUpdate(
+					{ event: id, user: user },
+					{ status: status },
+					{ upsert: true, new: true }
+				)
+					.then((rsvp) => {
+						if (rsvp) {
+							req.flash("success", "RSVP completed succesfully");
+							res.redirect("/users/profile");
+						} else {
+							req.flash("error", "There was an issue with your RSVP.");
+							res.redirect("back");
+						}
+					})
 
-				.catch((err) => {
-					req.flash("error", "There was an issue with your RSVP");
-					next(err);
-				});
+					.catch((err) => {
+						req.flash("error", "There was an issue with your RSVP");
+						next(err);
+					});
+			} else {
+				let err = new Error("Cannot find an event with id " + id);
+				err.status = 404;
+				next(err);
+			}
 		})
 		.catch((err) => next(err));
 };
