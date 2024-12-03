@@ -34,16 +34,17 @@
 	<div class="image">
 		[% if(event.image && event.image.length > 0){ %]
 		<!--img src="/img/brewery.jpg" alt="Man in brewery" /-->
-		<img src="[%= typeof event.image !== 'undefined'? event.image: ''%]" alt="" srcset="" />
+		<img src="[%= typeof event.image !== 'undefined'? event.image: ''%]" alt="Event Image" />
 		[% } %]
 	</div>
+	
 	<div class="info">
 		<p><b>Host: </b>[%= event.host.firstName + ' ' + event.host.lastName%]</p>
 		<p><b>Start Date and Time: </b>[%= event.start %]</p>
 		<p><b>End Date and Time: </b>[%= event.end %]</p>
-		<p><b>Location: </b>[%= event.location%]</p>
-		<p><b>Details: </b>[%= event.details%]</p>
-		<p><b>Number of rsvps: </b>[%= rsvps %]</p>
+		<p><b>Location: </b>[%= event.location %]</p>
+		<p><b>Details: </b>[%= event.details %]</p>
+		<p><b>Number of RSVPs: </b>[%= rsvps %]</p>
 	</div>
 </div>
 [%- include('../partials/after') %]

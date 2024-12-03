@@ -15,7 +15,7 @@ router.get("/", eventController.index);
 router.get("/new", isLoggedIn, eventController.new);
 
 //POST /events: create a new event
-router.post("/", isLoggedIn, fileUpload, eventController.create);
+router.post("/", isLoggedIn, fileUpload, validateEvent, validateResult, eventController.create);
 
 //GET /events/:id: send details of event identified by id
 router.get("/:id", validateId, eventController.show);
@@ -29,6 +29,8 @@ router.put(
 	isLoggedIn,
 	validateId,
 	isHost,
+	validateEvent,
+	validateResult,
 	fileUpload,
 	eventController.update
 );
