@@ -50,7 +50,7 @@ exports.show = (req, res, next) => {
 	let id = req.params.id;
 	Promise.all([
 		model.findById(id).populate("host", "firstName lastName").lean(),
-		Rsvp.countDocuments({ event: id, status: 'YES' }),
+		Rsvp.countDocuments({ event: id, status: "YES" }),
 	])
 		.then(([event, count]) => {
 			if (event) {
@@ -160,20 +160,33 @@ exports.rsvp = (req, res, next) => {
 	let id = req.params.id;
 	let user = req.session.user;
 	let status = req.body.status;
-	Rsvp.findOneAndUpdate(
-		{ event: id, user: user },
-		{ status: status },
-		{ upsert: true, new: true }
-	)
-		.then((rsvp) => {
-			if (rsvp) {
-				req.flash("success", "RSVP completed successfully");
-				res.redirect("/users/profile");
-			} else {
-				console.log(rsvp)
-				req.flash("error", "There was an issue with your RSVP");
-				res.redirect('back')
+	model
+		.findById(id)
+		.then((event) => {
+			if (event.host._id.toString() === user.toString()) {
+				let err = new Error("Hosts cannot RSVP to their own event.");
+				err.status = 401;
+				return next(err);
 			}
+			Rsvp.findOneAndUpdate(
+				{ event: id, user: user },
+				{ status: status },
+				{ upsert: true, new: true }
+			)
+				.then((rsvp) => {
+					if (rsvp) {
+						req.flash("success", "RSVP completed succesfully");
+						res.redirect("/users/profile");
+					} else {
+						req.flash("error", "There was an issue with your RSVP.");
+						res.redirect("back");
+					}
+				})
+
+				.catch((err) => {
+					req.flash("error", "There was an issue with your RSVP");
+					next(err);
+				});
 		})
 		.catch((err) => next(err));
 };
