@@ -3,7 +3,7 @@
 const express = require("express");
 const eventController = require("../controllers/eventController");
 const { fileUpload } = require("../middleware/fileUpload");
-const { validateId, validateEvent, validateResult } = require('../middleware/validator')
+const { validateId, validateEvent, validateResult, validateRsvp } = require('../middleware/validator')
 const { isHost, isLoggedIn} = require('../middleware/auth')
 
 const router = express.Router();
@@ -36,6 +36,6 @@ router.put(
 //DELETE /events/:id: delete the event identified by id
 router.delete("/:id", isLoggedIn, validateId, isHost, eventController.delete);
 
-router.post("/:id/rsvp", isLoggedIn, validateId, eventController.rsvp)
+router.post("/:id/rsvp", isLoggedIn, validateId, validateRsvp, validateResult, eventController.rsvp)
 
 module.exports = router;

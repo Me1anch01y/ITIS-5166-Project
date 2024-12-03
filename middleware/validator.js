@@ -22,7 +22,7 @@ exports.validateSignUp = [
 	body(
 		"password",
 		"Password must be at least 8 characters and at most 64 characters"
-	).isLength({ min: 8, max: 64 }),
+	).isLength({ min: 8, max: 64 }).trim(),
 ];
 
 exports.validateLogIn = [
@@ -34,7 +34,7 @@ exports.validateLogIn = [
 	body(
 		"password",
 		"Password must be at least 8 characters and at most 64 characters"
-	).isLength({ min: 8, max: 64 }),
+	).isLength({ min: 8, max: 64 }).trim(),
 ];
 
 exports.validateEvent = [
@@ -44,14 +44,37 @@ exports.validateEvent = [
 		.notEmpty()
 		.trim()
 		.isISO8601()
-		.isAfter(new Date())
+		.isAfter(new Date().toISOString())
+		.custom((value) => {
+			const inputDate = new Date(value);
+			const today = new Date();
+			if (inputDate <= today) {
+				throw new Error("Start date must be in the future.");
+			}
+			return true;
+		})
 		.escape(),
-	body("end", "Start must be a valid Date")
+	body("end", "End must be a valid Date")
 		.notEmpty()
 		.trim()
 		.isISO8601()
+		.custom((value, { req }) => {
+			const endDate = new Date(value);
+			const startDate = new Date(req.body.start);
+			if (endDate <= startDate) {
+				throw new Error("End date must be after start date.");
+			}
+			return true;
+		})
 		.escape(),
 	body('details', 'Details must be at least 10 characters').trim().isLength({min: 10}).escape()
+];
+
+exports.validateRsvp = [
+	body("status", "RSVP requires a yes, no or maybe response.")
+	.isIn(["YES", "NO", "MAYBE"])
+	.trim()
+	.escape()
 ];
 
 exports.validateResult = (req, res, next) => {

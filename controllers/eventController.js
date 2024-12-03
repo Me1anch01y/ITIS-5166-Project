@@ -163,15 +163,16 @@ exports.rsvp = (req, res, next) => {
 	Rsvp.findOneAndUpdate(
 		{ event: id, user: user },
 		{ status: status },
-		{ upsert: true }
+		{ upsert: true, new: true }
 	)
 		.then((rsvp) => {
 			if (rsvp) {
-				req.flash("success", "RSVP completed");
+				req.flash("success", "RSVP completed successfully");
 				res.redirect("/users/profile");
 			} else {
+				console.log(rsvp)
 				req.flash("error", "There was an issue with your RSVP");
-				res.redirect('/events/' + id)
+				res.redirect('back')
 			}
 		})
 		.catch((err) => next(err));
